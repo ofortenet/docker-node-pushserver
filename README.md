@@ -1,20 +1,17 @@
 # Push Server
 
-Push Server is a cross-plateform push server based on [node-apn](https://github.com/argon/node-apn) and [node-gcm](https://github.com/ToothlessGear/node-gcm). Push Server currently supports iOS (APN) and android (GCM) platforms. It uses mongoDB to store the push tokens. 
+Push Server is a cross-plateform push server based on [node-apn](https://github.com/argon/node-apn) and [node-gcm](https://github.com/ToothlessGear/node-gcm). Push Server currently supports iOS (APN) and android (GCM) platforms.
 Note that this server is not meant to be used as a front facing server as there's no particular security implemented.
 
-[![NPM](https://nodei.co/npm/node-pushserver.png?downloads=true&stars=true)](https://nodei.co/npm/node-pushserver/)
+**This fork has removed the user handling and accepts the device tokens directly. This is useful, if you use your own logic to register devices and store the tokens.**
+
+**Thus, it is not possible to send APN and GCM requests at the same time.**
+
+**TODO: APN feedback is disabled for now.**
 
 ## Getting started
 
-### 1 - Database
-
-node-pushserver uses mongodb to store the user / token associations. So you need to have a Mongo database setup beforehand
-
-See MongoDB ([MongoDB Download page](http://www.mongodb.org/downloads)).
-
-
-### 2 - Install node-pushserver
+### 1 - Install node-pushserver
 + From npm directly:
 
 ```shell
@@ -29,7 +26,7 @@ $ cd node-pushserver
 $ npm install -g
 ```
 
-### 3 - Configuration
+### 2 - Configuration
 
 If you checked out this project from github, you can find a configuration file example named 'example.config.json'.
 
@@ -37,8 +34,6 @@ If you checked out this project from github, you can find a configuration file e
 ```js
 {
 	"webPort": 8000,
-
-    "mongodbUrl": "mongodb://username:password@localhost/database",
 
     "gcm": {
         "apiKey": "YOUR_API_KEY_HERE"
@@ -66,13 +61,13 @@ If you checked out this project from github, you can find a configuration file e
 
 +  Read [Apple's Notification guide](https://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Introduction.html) to know how to get your certificates for APN.
 
-+ Please refer to node-apn's [documentation](https://github.com/argon/node-apn) to see all the available parameters and find how to convert your certificates into the expected format. 
++ Please refer to node-apn's [documentation](https://github.com/argon/node-apn) to see all the available parameters and find how to convert your certificates into the expected format.
 
 #### Dynamic configuration
 
-You can use the "process.env.MY_ENV_VAR" syntax in the config.json file. It will automatically be replaced by the value of the corresponding environment variable. 
+You can use the "process.env.MY_ENV_VAR" syntax in the config.json file. It will automatically be replaced by the value of the corresponding environment variable.
 
-### 4 - Start server
+### 3 - Start server
 
 ```shell
 $ pushserver -c /path/to/config.json
@@ -110,52 +105,53 @@ You can easily send push messages using the web interface available at `http://d
 http://domain:port/send (POST)
 ```
 + The content-type must be 'application/json'.
-+ Format : 
++ Format :
 
 ```json
 {
-  "users": ["user1"],
+  "tokens": ["androidToken"],
   "android": {
     "collapseKey": "optional",
     "data": {
       "message": "Your message here"
     }
-  },
+  }
+}
+```
+
+or:
+```json
+{
+  "tokens": ["iosToken"],
   "ios": {
     "badge": 0,
     "alert": "Your message here",
     "sound": "soundName"
   }
 }
+
 ```
 
-+ "users" is optionnal, but must be an array if set. If not defined, the push message will be sent to every user (filtered by target).
-+ You can send push messages to Android or iOS devices, or both, by using the "android" and "ios" fields with appropriate options. See GCM and APN documentation to find the available options. 
++ You can send push messages to Android or iOS devices, or both, by using the "android" and "ios" fields with appropriate options. See GCM and APN documentation to find the available options.
 
 #### Send push notifications
 ```
 http://domain:port/sendBatch (POST)
 ```
 + The content-type must be 'application/json'.
-+ Format : 
++ Format :
 
 ```json
 {
   "notifications": [{
-      "users": ["user1", "user2"],
-      "android": {
-        "collapseKey": "optional",
-        "data": {
-          "message": "Your message here"
-        }
-      },
+      "tokens": ["deviceToken1", "deviceToken2"],
       "ios": {
         "badge": 0,
         "alert": "Foo bar",
         "sound": "soundName"
       }
     },{
-      "users": ["user4"],
+      "tokens": ["deviceToken3"],
       "android": {
         "collapseKey": "optional",
         "data": {
@@ -167,82 +163,11 @@ http://domain:port/sendBatch (POST)
 }
 ```
 
-
-#### Subscribe
-```
-http://domain:port/subscribe (POST)
-```
-+ The content-type must be 'application/json'.
-+ Format:
-```js
-{
-  "user":"user1",
-  "type":"android",
-  "token":"CAFEBABE"
-}
-```
-+ All field are required
-+ "type" can be either "android" or "ios"
-+ A user can be linked to several devices and a device can be linked to serveral users.
-
-#### Unsubscribe
-```
-http://domain:port/unsubscribe (POST)
-```
-+ The content-type must be 'application/json'.
-+ Format:
-```js
-{
-  "token":"CAFEBABE"
-}
-```
-or
-```js
-{
-  "user":"user1"
-}
-```
-
-+ You can unsubscribe either a particular device, or all the devices for one user
-
-#### List Users
-```
-http://domain:port/users (GET)
-```
-+ Response format: 
-```js
-{
-    "users": [
-        "vilem"
-    ]
-}
-```
-
-#### List user's associations
-```
-http://domain:port/users/{user}/associations (GET)
-```
-+ Response format
-
-```js
-{
-    "associations": [
-        {
-            "user": "vilem",
-            "type": "ios",
-            "token": "06546b81450fc50fb3e26e513081f54642d7af3dedb57d9a4c557cc36a81dd252"
-        }
-    ]
-}
-```
-
-
 ## Dependencies
 
   * [node-apn](https://github.com/argon/node-apn)
   * [node-gcm](https://github.com/ToothlessGear/node-gcm)
   * [express](https://github.com/visionmedia/express)
-  * [mongoose](https://github.com/LearnBoost/mongoose)
   * [lodash](https://github.com/bestiejs/lodash.git )
   * [commander](https://github.com/visionmedia/commander.js)
 
