@@ -9,7 +9,6 @@
     "mongodb"
   ],
   "dependencies": {
-    "mongoose": "~3.6.11",
     "node-gcm": "~0.13.0",
     "lodash": "~1.3.1",
     "apn": "~1.7.5",
