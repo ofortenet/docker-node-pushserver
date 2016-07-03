@@ -1,7 +1,8 @@
-# Push Server
+# Docker Node Push Server
 
 Push Server is a cross-plateform push server based on [node-apn](https://github.com/argon/node-apn) and [node-gcm](https://github.com/ToothlessGear/node-gcm). Push Server currently supports iOS (APN) and android (GCM) platforms.
 Note that this server is not meant to be used as a front facing server as there's no particular security implemented.
+
 
 **This fork has removed the user handling and accepts the device tokens directly. This is useful, if you use your own logic to register devices and store the tokens.**
 
@@ -11,20 +12,41 @@ Note that this server is not meant to be used as a front facing server as there'
 
 ## Getting started
 
-### 1 - Install node-pushserver
-+ From npm directly:
+### 0 - Install node-pushserver locally (optional)
 
 ```shell
-$ npm install node-pushserver -g
-```
-
-+ From git:
-
-```shell
-$ git clone git://github.com/Smile-SA/node-pushserver.git
-$ cd node-pushserver
+$ git clone git://github.com/jgontrum/docker-node-pushserver.git
+$ cd docker-node-pushserver
 $ npm install -g
 ```
+
+### 1 - Docker
+Prepare the folder ```config``` which contains:
+- The ```config.json``` that uses absolute paths for the certificates.
+  The prefix is: ```/usr/pushserver/config/```.
+- A ```cert.pem``` file.
+- A ```key.pem``` file.
+
+Build the docker image:
+```shell
+$ git clone git://github.com/jgontrum/docker-node-pushserver.git
+$ cd docker-node-pushserver
+$ cp -r /path/to/config config
+$ docker build -t pushserver .
+```
+
+Start the docker container (with port forwarding, insecure!):
+```shell
+$ docker run --name="pushserver" -d -p 54545:54545 pushserver
+```
+
+Start the docker container with a local port (preferred):
+```shell
+$ docker run --name="pushserver" -d pushserver
+```
+
+#### Performance
+The container is based on the latest Ubuntu and requires only about 38MB RAM.
 
 ### 2 - Configuration
 

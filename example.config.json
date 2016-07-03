@@ -8,13 +8,13 @@
     "apn": {
         "connection": {
             "gateway": "gateway.push.apple.com",
-            "cert": "/path/to/cert.pem",
-            "key": "/path/to/key.pem"
+            "cert": "/usr/pushserver/cert.pem",
+            "key": "/usr/pushserver/key.pem"
         },
         "feedback": {
             "address": "feedback.push.apple.com",
-            "cert": "/path/to/cert.pem",
-            "key": "/path/to/key.pem",
+            "cert": "/usr/pushserver/cert.pem",
+            "key": "/usr/pushserver/key.pem",
             "interval": 43200,
             "batchFeedback": true
         }
