@@ -31,7 +31,7 @@ program.version(pack.version)
     .option('-o, --override [overrideValue]', 'Overrides a config value. [overrideValue] should be of the form key=value or key.subKey=value. If the value begins with process.env, it is evaluated.', collect, [])
     .parse(process.argv);
 
-var configPath = program.config;
+var configPath = "/usr/pushserver/config/config.json";
 if (configPath) {
     configPath = configPath.indexOf('/') === 0 ? configPath : path.join(process.cwd(), configPath);
     if (!fs.existsSync(configPath)) {
