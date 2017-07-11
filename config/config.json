@@ -1,5 +1,5 @@
 {
-    "webPort": 54545,
+    "webPort": 8080,
 
     "gcm": {
         "apiKey": "YOUR_API_KEY_HERE"
