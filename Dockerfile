@@ -5,7 +5,7 @@
 FROM ubuntu:xenial
 
 # Use this port
-EXPOSE 54545
+EXPOSE 8080
 
 # Install the needed nodejs packages
 RUN apt-get update
